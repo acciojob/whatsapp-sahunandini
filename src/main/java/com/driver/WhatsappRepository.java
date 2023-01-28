@@ -1,14 +1,13 @@
 package com.driver;
 
-import java.util.*;
-
 import org.springframework.stereotype.Repository;
+
+import java.util.*;
 
 @Repository
 public class WhatsappRepository {
 
-    //Assume that each user belongs to at most one group
-    //You can use the below mentioned hashmaps or delete these and create your own.
+    //Assume that each user belongs to at most once group
     private HashMap<Group, List<User>> groupUserMap;
     private HashMap<Group, List<Message>> groupMessageMap;
     private HashMap<Message, User> senderMap;
@@ -27,9 +26,9 @@ public class WhatsappRepository {
         this.messageId = 0;
     }
 
-    public String createUser(String name, String mobile)throws Exception {
+    public String createUser(String name, String mobile) throws Exception {
 
-        if(userMobile.contains(mobile)) {
+        if(userMobile.contains(mobile)){
             throw new Exception("User already exists");
         }
         userMobile.add(mobile);
@@ -37,9 +36,9 @@ public class WhatsappRepository {
         return "SUCCESS";
     }
 
-    public Group createGroup(List<User> users) {
+    public Group createGroup(List<User> users){
 
-        if(users.size() == 2) {
+        if(users.size()==2){
             Group group = new Group(users.get(1).getName(), 2);
             adminMap.put(group, users.get(0));
             groupUserMap.put(group, users);
@@ -47,31 +46,32 @@ public class WhatsappRepository {
             return group;
         }
         this.customGroupCount += 1;
-        Group group = new Group(new String("Group"+this.customGroupCount), users.size());
+        Group group = new Group(new String("Group "+this.customGroupCount), users.size());
         adminMap.put(group, users.get(0));
         groupUserMap.put(group, users);
         groupMessageMap.put(group, new ArrayList<Message>());
         return group;
     }
 
-    public int createMessage(String content) {
+    public int createMessage(String content){
 
         this.messageId += 1;
         Message message = new Message(messageId, content);
         return message.getId();
     }
 
-    public int sendMessage(Message message, User sender, Group group)throws Exception {
-        if(adminMap.containsKey(group)) {
+    public int sendMessage(Message message, User sender, Group group) throws Exception{
+
+        if(adminMap.containsKey(group)){
             List<User> users = groupUserMap.get(group);
             Boolean userFound = false;
-            for (User user: users) {
-                if(user.equals(sender)) {
+            for(User user: users){
+                if(user.equals(sender)){
                     userFound = true;
                     break;
                 }
             }
-            if(userFound) {
+            if(userFound){
                 senderMap.put(message, sender);
                 List<Message> messages = groupMessageMap.get(group);
                 messages.add(message);
@@ -83,7 +83,7 @@ public class WhatsappRepository {
         throw new Exception("Group does not exist");
     }
 
-    public String changeAdmin(User approver, User user, Group group) throws Exception {
+    public String changeAdmin(User approver, User user, Group group) throws Exception{
         if(adminMap.containsKey(group)){
             if(adminMap.get(group).equals(approver)){
                 List<User> participants = groupUserMap.get(group);
@@ -105,7 +105,7 @@ public class WhatsappRepository {
         throw new Exception("Group does not exist");
     }
 
-    public int removeUser(User user) throws Exception {
+    public int removeUser(User user) throws Exception{
         Boolean userFound = false;
         Group userGroup = null;
         for(Group group: groupUserMap.keySet()){
@@ -155,7 +155,7 @@ public class WhatsappRepository {
         throw new Exception("User not found");
     }
 
-    public String findMessage(Date start, Date end, int K) throws Exception {
+    public String findMessage(Date start, Date end, int K) throws Exception{
         List<Message> messages = new ArrayList<>();
         for(Group group: groupMessageMap.keySet()){
             messages.addAll(groupMessageMap.get(group));
